@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn, shuffle } from "@/lib/utils";
 import {
   DIFFICULTY_COLOR,
   DOMAIN_RING,
@@ -73,6 +73,14 @@ export function QuestionCard({
   const [bookmarked, setBookmarked] = React.useState(!!question.bookmarked);
   const [showNote, setShowNote] = React.useState(false);
   const [noteText, setNoteText] = React.useState(question.note ?? "");
+
+  // In review mode, preserve the original (stored) order so users can correlate
+  // their results with what they saw during the exam. Otherwise, shuffle options
+  // each time the question becomes active so position doesn't leak the answer.
+  const displayOptions = React.useMemo(
+    () => (mode === "review" ? question.options : shuffle(question.options)),
+    [question.id, mode] // eslint-disable-line react-hooks/exhaustive-deps
+  );
 
   // reset state when question changes
   React.useEffect(() => {
@@ -230,7 +238,7 @@ export function QuestionCard({
           )}
 
           <div className="grid gap-2">
-            {question.options.map((option, idx) => {
+            {displayOptions.map((option, idx) => {
               const state = optionState(option.id);
               return (
                 <button

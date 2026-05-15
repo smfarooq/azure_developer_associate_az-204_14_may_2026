@@ -47,7 +47,7 @@ export default function PracticePage() {
 
   React.useEffect(() => {
     if (!data) return;
-    setOrder(data.items.map((q) => q.id));
+    setOrder(shuffle(data.items.map((q) => q.id)));
     setIdx(0);
   }, [data]);
 
