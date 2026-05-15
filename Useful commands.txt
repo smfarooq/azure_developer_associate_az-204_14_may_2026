@@ -1,0 +1,4 @@
+npm run dev — start dev server
+npm run db:reset — wipe + reseed
+npm run db:seed — re-seed (idempotent upsert)
+npx prisma studio — visual DB editor

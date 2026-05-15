@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// AZ-204 exam domains (Microsoft official):
+//   compute    - Develop Azure compute solutions (25-30%)
+//   storage    - Develop for Azure storage (15-20%)
+//   security   - Implement Azure security (20-25%)
+//   monitor    - Monitor, troubleshoot, and optimize Azure solutions (15-20%)
+//   connect    - Connect to and consume Azure services and third-party services (15-20%)
+
+model Question {
+  id            String   @id @default(cuid())
+  externalId    String?  @unique
+  domain        String
+  topic         String
+  difficulty    String   // easy | medium | hard
+  type          String   // single | multi
+  prompt        String
+  code          String?
+  codeLanguage  String?
+  explanation   String
+  reference     String?
+  tags          String   // comma-separated
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  options       Option[]
+  attempts      Attempt[]
+  bookmarks     Bookmark[]
+  notes         Note[]
+
+  @@index([domain])
+  @@index([difficulty])
+}
+
+model Option {
+  id          String   @id @default(cuid())
+  questionId  String
+  text        String
+  isCorrect   Boolean  @default(false)
+  rationale   String?
+  order       Int
+
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([questionId])
+}
+
+model ExamSession {
+  id            String    @id @default(cuid())
+  mode          String    // exam | practice | flashcards
+  domain        String?
+  difficulty    String?
+  questionIds   String    // JSON array of question IDs in order
+  durationSec   Int
+  startedAt     DateTime  @default(now())
+  completedAt   DateTime?
+  score         Float?
+  totalAnswered Int       @default(0)
+  totalCorrect  Int       @default(0)
+
+  attempts      Attempt[]
+}
+
+model Attempt {
+  id            String   @id @default(cuid())
+  sessionId     String?
+  questionId    String
+  selectedIds   String   // JSON array of selected option IDs
+  isCorrect     Boolean
+  confidence    Int?     // 1-5
+  timeSpentMs   Int      @default(0)
+  markedForReview Boolean @default(false)
+  createdAt     DateTime @default(now())
+
+  session       ExamSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  question      Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([questionId])
+}
+
+model Bookmark {
+  id          String   @id @default(cuid())
+  questionId  String   @unique
+  createdAt   DateTime @default(now())
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Note {
+  id          String   @id @default(cuid())
+  questionId  String   @unique
+  body        String
+  updatedAt   DateTime @updatedAt
+
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}

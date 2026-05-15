@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(node -v)",
+      "PowerShell(npm -v)",
+      "PowerShell(@\\('/practice','/exam','/flashcards','/bookmarks','/stats','/admin'\\) | ForEach-Object { $u = \"http://localhost:3000$_\"; $r = try { Invoke-WebRequest -Uri $u -UseBasicParsing -TimeoutSec 60 } catch { $_.Exception.Response }; \"$_  ->  $\\($r.StatusCode\\)\" })"
+    ]
+  }
+}
