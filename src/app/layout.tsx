@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen gradient-bg">
+      <body className="min-h-screen gradient-bg" suppressHydrationWarning>
         <Providers>
           <Nav />
           <main className="container py-8">{children}</main>
